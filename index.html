@@ -90,7 +90,7 @@
     const msg = document.getElementById('loveMsg');
     const buttonsDiv = document.querySelector('.buttons');
 
-    noBtn.addEventListener('mouseover', () => {
+    function moveNoButton() {
       const maxX = buttonsDiv.clientWidth - noBtn.offsetWidth;
       const maxY = buttonsDiv.clientHeight - noBtn.offsetHeight;
 
@@ -99,6 +99,15 @@
 
       noBtn.style.left = randomX + 'px';
       noBtn.style.top = randomY + 'px';
+    }
+
+    // Desktop hover
+    noBtn.addEventListener('mouseover', moveNoButton);
+
+    // Mobile touch
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
     });
 
     yesBtn.addEventListener('click', () => {
@@ -108,4 +117,3 @@
   </script>
 </body>
 </html>
-
