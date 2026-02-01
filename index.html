@@ -1,226 +1,109 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Informatique</title>
-<style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-    .quiz-container { max-width: 700px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; color: #333; }
-    .question-num { font-size: 14px; color: #555; margin-bottom: 5px; }
-    .question { font-weight: bold; margin-bottom: 15px; }
-    .answers { list-style: none; padding: 0; }
-    .answers li { margin-bottom: 10px; }
-    button { padding: 10px 20px; font-size: 16px; margin-top: 20px; cursor: pointer; }
-    #feedback { margin-top: 10px; font-weight: bold; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Be My Valentine 💖</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .card {
+      background: white;
+      padding: 40px 30px 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      text-align: center;
+      width: 320px;
+      position: relative;
+    }
+    h1 {
+      margin-top: 0;
+      color: #e91e63;
+    }
+    p {
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+    .buttons {
+      position: relative;
+      height: 120px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    #yesBtn {
+      background-color: #e91e63;
+      color: white;
+    }
+    #yesBtn:hover {
+      transform: scale(1.1);
+    }
+    #noBtn {
+      background-color: #ccc;
+      color: #333;
+      position: absolute;
+      left: 50%;
+      top: 60px;
+      transform: translateX(-50%);
+    }
+    .message {
+      display: none;
+      margin-top: 20px;
+      font-size: 20px;
+      color: #e91e63;
+    }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Imane 💕</h1>
+    <p>Will you be my Valentine?</p>
 
-<h1>Bon courage ❤️💕</h1>
+    <div class="buttons">
+      <button id="yesBtn">Yes 💖</button>
+      <button id="noBtn">No 🙈</button>
+    </div>
 
-<div class="quiz-container">
-    <div id="quiz"></div>
-    <button id="check">Vérifier</button>
-    <button id="next" style="display:none;">Suivant</button>
-    <div id="feedback"></div>
-    <div id="result"></div>
-</div>
+    <div class="message" id="loveMsg">
+      Yayyy! 💕💐<br />
+      I knew you'd say YES 😍
+    </div>
+  </div>
 
-<script>
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const msg = document.getElementById('loveMsg');
+    const buttonsDiv = document.querySelector('.buttons');
 
-const quizData = [
-    { question: "1. Quel est le rôle principal d’un compilateur dans un programme informatique ?", options: {A:"Exécuter le code ligne par ligne", B:"Traduire le code source en code machine", C:"Optimiser la mémoire du programme", D:"Gérer les entrées et sorties"}, answer: "B" },
-    { question: "2. Quel type de boucle permet d’exécuter une série d’instructions un nombre fixe de fois ?", options: {A:"Boucle while", B:"Boucle do-while", C:"Boucle for", D:"Boucle foreach"}, answer: "C" },
-    { question: "3. Lequel des éléments suivants est un langage de programmation de haut niveau ?", options: {A:"Assembler", B:"Code machine", C:"Python", D:"Binaire"}, answer: "C" },
-    { question: "4. Quel est le but de la fonction récursive dans un programme ?", options: {A:"Exécuter le code plus rapidement", B:"Déboguer automatiquement", C:"Appeler elle-même pour résoudre un problème", D:"Stocker des données"}, answer: "C" },
-    { question: "5. Quel est l’intérêt principal des structures de données comme les tableaux ou les listes ?", options: {A:"Exécuter les programmes plus vite", B:"Gérer des collections d’éléments de manière organisée", C:"Sécuriser les données", D:"Compiler le code"}, answer: "B" },
-    { question: "6. Quelle est la différence entre une variable globale et une variable locale dans un programme ?", options: {A:"Une variable globale est locale à une fonction", B:"Une variable locale est accessible partout", C:"Une variable globale est accessible partout dans le programme", D:"Il n’y a pas de différence"}, answer: "C" },
-    { question: "7. Quel est le rôle principal de l’algorithme de tri rapide (QuickSort) ?", options: {A:"Chercher des éléments dans un tableau", B:"Fusionner des tableaux", C:"Compresser les données", D:"Trier une liste en utilisant des sous-tableaux et des pivots"}, answer: "D" },
-    { question: "8. Le modèle client-serveur est principalement utilisé pour :", options: {A:"Stocker des fichiers", B:"Programmer des applications mobiles", C:"La communication entre un client et un serveur via un réseau", D:"Crypter les données"}, answer: "C" },
-    { question: "9. Quel est le rôle principal de la mémoire cache dans un ordinateur ?", options: {A:"Stocker des fichiers", B:"Augmenter la capacité du disque dur", C:"Accélérer l’accès aux données fréquemment utilisées", D:"Gérer le système d’exploitation"}, answer: "C" },
-    { question: "10. Quel type d’algorithme est utilisé pour la recherche binaire ?", options: {A:"Recherche linéaire", B:"Recherche par division en deux", C:"Recherche aléatoire", D:"Recherche séquentielle"}, answer: "B" },
-    { question: "11. Quelle est la complexité temporelle du tri par insertion dans le pire des cas ?", options: {A:"O(n)", B:"O(log n)", C:"O(n²)", D:"O(n log n)"}, answer: "C" },
-    { question: "12. Qu’est-ce qu’un pointeur en langage C ?", options: {A:"Une variable qui stocke une valeur", B:"Une variable qui exécute une fonction", C:"Une variable qui stocke l’adresse mémoire d’une autre variable", D:"Une constante"}, answer: "C" },
-    { question: "13. Lequel des éléments suivants n’est pas une structure de données linéaire ?", options: {A:"Tableau", B:"Liste chaînée", C:"Arbre binaire", D:"Pile"}, answer: "C" },
-    { question: "14. Lequel des énoncés suivants est vrai concernant une fonction récursive ?", options: {A:"Elle peut s’exécuter sans condition", B:"Elle doit avoir une condition d’arrêt", C:"Elle ne peut pas appeler d’autres fonctions", D:"Elle est toujours rapide"}, answer: "B" },
-    { question: "15. Qu’est-ce qu’une “faille zero-day” ?", options: {A:"Une mise à jour logicielle", B:"Un antivirus", C:"Une attaque planifiée", D:"Une vulnérabilité avant publication d’un correctif"}, answer: "D" },
-    { question: "16. Quel est le modèle de référence le plus utilisé pour les réseaux informatiques ?", options: {A:"Modèle TCP/IP", B:"Modèle OSI", C:"Modèle Ethernet", D:"Modèle HTTP"}, answer: "A" },
-    { question: "17. Quelle couche du modèle OSI est responsable du routage des paquets de données ?", options: {A:"Couche réseau", B:"Couche transport", C:"Couche application", D:"Couche physique"}, answer: "A" },
-    { question: "18. Le protocole HTTP fonctionne sur quelle couche du modèle OSI ?", options: {A:"Couche réseau", B:"Couche application", C:"Couche transport", D:"Couche liaison"}, answer: "B" },
-    { question: "19. Quel protocole est utilisé pour traduire les noms de domaine en adresses IP ?", options: {A:"FTP", B:"DNS", C:"SMTP", D:"HTTP"}, answer: "B" },
-    { question: "20. Quel est le rôle principal du protocole TCP dans les communications réseau ?", options: {A:"Transmission sans erreurs", B:"Gérer les erreurs et assurer un transfert fiable", C:"Crypter les données", D:"Attribuer des adresses IP"}, answer: "B" },
-    { question: "21. Qu’est-ce qu’une adresse IP privée ?", options: {A:"Adresse IP publique", B:"Adresse utilisée dans un réseau local", C:"Adresse IP dynamique sur internet", D:"Adresse IPv6"}, answer: "B" },
-    { question: "22. Quel est le rôle principal d’un routeur dans un réseau informatique ?", options: {A:"Stocker des fichiers", B:"Attribuer des IP", C:"Transmettre des paquets entre réseaux", D:"Gérer les serveurs"}, answer: "C" },
-    { question: "23. Quel protocole est utilisé pour la communication sans connexion, rapide mais non fiable ?", options: {A:"TCP", B:"UDP", C:"HTTP", D:"FTP"}, answer: "B" },
-    { question: "24. Quel est le rôle d’un serveur proxy dans un réseau ?", options: {A:"Filtrer les virus", B:"Intercepter et relayer les demandes des clients", C:"Attribuer des IP", D:"Gérer les routeurs"}, answer: "B" },
-    { question: "25. Quelle est la principale différence entre IPv4 et IPv6 ?", options: {A:"IPv6 est plus lent", B:"IPv6 a des adresses de 128 bits", C:"IPv4 est plus sécurisé", D:"Aucune différence"}, answer: "B" },
-    { question: "26. Quel protocole est utilisé pour envoyer des emails ?", options: {A:"HTTP", B:"SMTP", C:"FTP", D:"DNS"}, answer: "B" },
-    { question: "27. Qu'est-ce que le DHCP fait dans un réseau ?", options: {A:"Attribue dynamiquement des adresses IP", B:"Crypte les données", C:"Contrôle le trafic", D:"Filtre les emails"}, answer: "A" },
-    { question: "28. Quel est le rôle d’un commutateur (switch) dans un réseau local ?", options: {A:"Crypter les données", B:"Attribuer des IP", C:"Relier plusieurs appareils et transmettre selon MAC", D:"Stocker des fichiers"}, answer: "C" },
-    { question: "29. Qu’est-ce qu’un VLAN ?", options: {A:"Un virus réseau", B:"Réseau local virtuel", C:"Routeur virtuel", D:"Adresse IP privée"}, answer: "B" },
-    { question: "30. Lequel des éléments suivants est un protocole de routage dynamique ?", options: {A:"Static Routing", B:"RIP", C:"BGP", D:"OSPF"}, answer: "D" },
-    { question: "31. Quelle commande permet de tester la connectivité réseau ?", options: {A:"traceroute", B:"ping", C:"ipconfig", D:"netstat"}, answer: "B" },
-    { question: "32. Quelle commande sous Windows affiche les configurations réseau ?", options: {A:"netstat", B:"ping", C:"tracert", D:"ipconfig"}, answer: "D" },
-    { question: "33. Qu’est-ce qu’un tunnel VPN ?", options: {A:"Un virus", B:"Lien chiffré entre réseaux", C:"Un protocole HTTP", D:"Un pare-feu"}, answer: "B" },
-    { question: "34. Quelle est la différence entre LAN et WAN ?", options: {A:"LAN est plus lent", B:"LAN couvre petite zone, WAN grande", C:"WAN est local", D:"Aucune différence"}, answer: "B" },
-    { question: "35. Le NAT sert à :", options: {A:"Filtrer les paquets", B:"Traduire des IP privées en publiques", C:"Attribuer des noms de domaine", D:"Crypter les données"}, answer: "B" },
-    { question: "36. Quel est le rôle principal d’un système d’exploitation ?", options: {A:"Programmer", B:"Gérer ressources matérielles et logicielles", C:"Transférer des fichiers", D:"Attribuer des IP"}, answer: "B" },
-    { question: "37. Quel type de système d’exploitation permet à plusieurs utilisateurs d’exécuter des programmes simultanément ?", options: {A:"Mono-utilisateur", B:"Temps réel", C:"Multi-utilisateur", D:"Mobile"}, answer: "C" },
-    { question: "38. Quel est le rôle d’un gestionnaire de mémoire ?", options: {A:"Planifier les processus", B:"Allouer et libérer la mémoire", C:"Exécuter le code", D:"Attribuer des IP"}, answer: "B" },
-    { question: "39. Quel est le but du système de fichiers ?", options: {A:"Crypter les fichiers", B:"Gérer le stockage et récupération des données", C:"Attribuer des IP", D:"Compiler les programmes"}, answer: "B" },
-    { question: "40. Dans un système multitâche, qu’est-ce qu’un processus ?", options: {A:"Une tâche planifiée", B:"Un programme en cours d’exécution", C:"Un fichier", D:"Un thread"}, answer: "B" },
-    { question: "41. Le système de fichiers par défaut sous Windows est :", options: {A:"FAT32", B:"EXT4", C:"NTFS", D:"HFS+"}, answer: "C" },
-    { question: "42. Quel est le rôle principal du noyau ?", options: {A:"Gérer les fichiers", B:"Attribuer des IP", C:"Gérer les processus et la mémoire", D:"Compiler le code"}, answer: "C" },
-    { question: "43. Qu’est-ce qu’un thread ?", options: {A:"Un fichier temporaire", B:"Une unité d'exécution plus petite qu’un processus", C:"Un processus bloqué", D:"Un virus"}, answer: "B" },
-    { question: "44. Quel est le rôle d’un ordonnanceur ?", options: {A:"Planifier l’exécution des processus", B:"Allouer des IP", C:"Crypter les données", D:"Attribuer des fichiers"}, answer: "A" },
-    { question: "45. Avantage d’un système d’exploitation en temps réel ?", options: {A:"Sécurisé", B:"Réponse immédiate à un événement", C:"Plus rapide", D:"Gère IP et DNS"}, answer: "B" },
-    { question: "46. But de la mémoire virtuelle ?", options: {A:"Allouer plus de mémoire que physique", B:"Crypter les fichiers", C:"Attribuer des IP", D:"Exécuter plus de threads"}, answer: "A" },
-    { question: "47. Qu’est-ce qu’un processus zombie ?", options: {A:"Processus actif", B:"Processus terminé mais présent dans table", C:"Virus", D:"Thread bloqué"}, answer: "B" },
-    { question: "48. Rôle d’un pilote (driver) ?", options: {A:"Exécuter le code", B:"Traduire commandes système vers matériel", C:"Allouer mémoire", D:"Attribuer IP"}, answer: "B" },
-    { question: "49. Principal avantage d’un système de fichiers journalisé ?", options: {A:"Sécurisé", B:"Récupération rapide après panne", C:"Plus rapide", D:"Attribue des fichiers"}, answer: "B" },
-    { question: "50. Rôle de la commande chmod ?", options: {A:"Modifier permissions", B:"Exécuter programme", C:"Attribuer IP", D:"Lister fichiers"}, answer: "A" },
-    { question: "51. Rôle de la commande ps ?", options: {A:"Afficher fichiers", B:"Visualiser processus en cours", C:"Crypter données", D:"Attribuer IP"}, answer: "B" },
-    { question: "52. Qu’est-ce qu’un deadlock ?", options: {A:"Processus en attente indéfinie", B:"Crash système", C:"Virus", D:"Erreur mémoire"}, answer: "A" },
-    { question: "53. Qu’est-ce qu’une base de données relationnelle ?", options: {A:"Stockage fichiers", B:"Données en tableaux liés par relations", C:"Serveur web", D:"Mémoire RAM"}, answer: "B" },
-    { question: "54. Langage utilisé pour manipuler données dans une base relationnelle ?", options: {A:"Python", B:"SQL", C:"C", D:"Java"}, answer: "B" },
-    { question: "55. Qu’est-ce qu’une clé primaire ?", options: {A:"Identifie chaque enregistrement", B:"Crypte données", C:"Attribue IP", D:"Lien externe"}, answer: "A" },
-    { question: "56. Différence entre clé primaire et clé étrangère ?", options: {A:"Primaire identifie, étrangère lie tables", B:"Aucune", C:"Primaire lie, étrangère identifie", D:"Les deux identifient"}, answer: "A" },
-    { question: "57. Commande SQL pour insérer un enregistrement ?", options: {A:"UPDATE", B:"INSERT", C:"DELETE", D:"CREATE"}, answer: "B" },
-    { question: "58. Qu'est-ce qu’une jointure (JOIN) ?", options: {A:"Filtrage", B:"Lier tables selon colonne commune", C:"Supprimer table", D:"Modifier table"}, answer: "B" },
-    { question: "59. Rôle d’une transaction ?", options: {A:"Attribuer mémoire", B:"Assurer opérations complètes et cohérentes (ACID)", C:"Allouer IP", D:"Modifier fichiers"}, answer: "B" },
-    { question: "60. Commande SQL pour modifier un enregistrement ?", options: {A:"DELETE", B:"INSERT", C:"UPDATE", D:"CREATE"}, answer: "C" },
-    { question: "61. Lequel n'est pas un type de jointure SQL ?", options: {A:"INNER", B:"LEFT", C:"RIGHT", D:"OUTER UNION"}, answer: "D" },
-    { question: "62. Rôle d’une vue (view) ?", options: {A:"Stocker données", B:"Représentation virtuelle d’une table", C:"Supprimer table", D:"Modifier table"}, answer: "B" },
-    { question: "63. Commande SQL pour supprimer une table ?", options: {A:"DROP TABLE", B:"DELETE", C:"TRUNCATE", D:"ALTER TABLE"}, answer: "A" },
-    { question: "64. Normalisation dans une base ?", options: {A:"Réduire redondance et améliorer intégrité", B:"Supprimer table", C:"Modifier fichiers", D:"Allouer mémoire"}, answer: "A" },
-    { question: "65. Qu’est-ce qu’un index ?", options: {A:"Structure pour améliorer recherche", B:"Crypte données", C:"Attribue IP", D:"Supprime table"}, answer: "A" },
-    { question: "66. Commande SQL pour créer une table ?", options: {A:"CREATE TABLE", B:"INSERT", C:"UPDATE", D:"DROP"}, answer: "A" },
-    { question: "67. Signification de ACID ?", options: {A:"Atomicité, Cohérence, Isolation, Durabilité", B:"IP, TCP, DNS, DHCP", C:"Créer, Lire, Modifier, Supprimer", D:"Aucune"}, answer: "A" },
-    { question: "68. Rôle d’un serveur web ?", options: {A:"Stocker fichiers", B:"Transmettre pages web via HTTP/HTTPS", C:"Attribuer IP", D:"Compiler code"}, answer: "B" },
-    { question: "69. Protocole sécurisé pour web ?", options: {A:"HTTP", B:"HTTPS", C:"FTP", D:"SMTP"}, answer: "B" },
-    { question: "70. Quel serveur utilise Apache ?", options: {A:"Windows", B:"Linux/Unix", C:"MacOS", D:"Android"}, answer: "B" },
-    { question: "71. Qu’est-ce qu’un cookie ?", options: {A:"Virus", B:"Petit fichier stocké par navigateur pour session/utilisateur", C:"IP", D:"Processus OS"}, answer: "B" },
-    { question: "72. Différence entre GET et POST ?", options: {A:"GET pour lecture, POST pour envoi sécurisé", B:"GET supprime données, POST modifie", C:"Aucune", D:"GET crypte, POST non"}, answer: "A" },
-    { question: "73. Rôle d’un pare-feu ?", options: {A:"Transmettre paquets", B:"Filtrer trafic réseau", C:"Compiler code", D:"Allouer mémoire"}, answer: "B" },
-    { question: "74. Qu’est-ce qu’un malware ?", options: {A:"Programme malveillant", B:"Logiciel utile", C:"Serveur", D:"Protocole"}, answer: "A" },
-    { question: "75. Qu’est-ce qu’un ransomware ?", options: {A:"Virus simple", B:"Programme qui chiffre fichiers et demande rançon", C:"Pare-feu", D:"Protocole réseau"}, answer: "B" }
-    // Continue similarly until question 120
-];
+    noBtn.addEventListener('mouseover', () => {
+      const maxX = buttonsDiv.clientWidth - noBtn.offsetWidth;
+      const maxY = buttonsDiv.clientHeight - noBtn.offsetHeight;
 
-  // Questions 76-120
-quizData.push(
-    { question: "76. Qu’est-ce qu’un antivirus ?", options: {A:"Logiciel pour détecter et supprimer malwares", B:"Virus informatique", C:"Serveur web", D:"Pare-feu"}, answer: "A" },
-    { question: "77. Différence entre HTTP et HTTPS ?", options: {A:"HTTPS crypte la communication", B:"HTTP crypte", C:"Aucune", D:"HTTPS plus lent uniquement"}, answer: "A" },
-    { question: "78. Qu’est-ce qu’un serveur DNS ?", options: {A:"Stocke fichiers", B:"Traduit noms de domaine en IP", C:"Crypte données", D:"Transmet emails"}, answer: "B" },
-    { question: "79. Quel protocole est utilisé pour transférer des fichiers ?", options: {A:"FTP", B:"SMTP", C:"HTTP", D:"DNS"}, answer: "A" },
-    { question: "80. Qu’est-ce que le cloud computing ?", options: {A:"Serveur local", B:"Services informatiques via internet", C:"Mémoire virtuelle", D:"Logiciel antivirus"}, answer: "B" },
-    { question: "81. Avantage principal du cloud ?", options: {A:"Coût élevé", B:"Accessibilité, évolutivité et stockage flexible", C:"Sécurité réduite", D:"Processus plus lent"}, answer: "B" },
-    { question: "82. Qu’est-ce qu’un SaaS ?", options: {A:"Matériel informatique", B:"Application accessible via internet", C:"Protocole réseau", D:"Système d’exploitation"}, answer: "B" },
-    { question: "83. Qu’est-ce que PaaS ?", options: {A:"Plateforme pour développer et déployer applications", B:"Protocole réseau", C:"Serveur web", D:"Type de base de données"}, answer: "A" },
-    { question: "84. Qu’est-ce qu’IaaS ?", options: {A:"Infrastructure via internet (serveurs, stockage, réseau)", B:"Application mobile", C:"Langage de programmation", D:"Pare-feu"}, answer: "A" },
-    { question: "85. Qu’est-ce qu’une API ?", options: {A:"Programme antivirus", B:"Interface pour communiquer entre logiciels", C:"Serveur web", D:"Langage SQL"}, answer: "B" },
-    { question: "86. Différence entre REST et SOAP ?", options: {A:"REST utilise HTTP et JSON, SOAP XML", B:"Aucune", C:"REST est plus lent", D:"SOAP ne fonctionne pas sur internet"}, answer: "A" },
-    { question: "87. Qu’est-ce qu’un framework ?", options: {A:"Bibliothèque logicielle structurée pour faciliter dev", B:"Langage de programmation", C:"Serveur", D:"Protocole réseau"}, answer: "A" },
-    { question: "88. Exemple de framework web côté serveur ?", options: {A:"Laravel", B:"React", C:"Bootstrap", D:"CSS"}, answer: "A" },
-    { question: "89. Exemple de framework web côté client ?", options: {A:"React", B:"Laravel", C:"PHP", D:"MySQL"}, answer: "A" },
-    { question: "90. Qu’est-ce qu’une SPA (Single Page Application) ?", options: {A:"Application web qui recharge une seule page et met à jour contenu dynamiquement", B:"Serveur web", C:"Base de données", D:"Langage"}, answer: "A" },
-    { question: "91. Qu’est-ce qu’un CMS ?", options: {A:"Système pour créer et gérer contenu web facilement", B:"Serveur", C:"Protocole", D:"Antivirus"}, answer: "A" },
-    { question: "92. Exemple de CMS populaire ?", options: {A:"WordPress", B:"PHP", C:"React", D:"MySQL"}, answer: "A" },
-    { question: "93. Qu’est-ce qu’une attaque DDoS ?", options: {A:"Attaque visant à saturer un serveur par trafic massif", B:"Virus informatique", C:"Malware", D:"Pare-feu"}, answer: "A" },
-    { question: "94. Qu’est-ce qu’un certificat SSL ?", options: {A:"Certificat pour sécuriser communication via HTTPS", B:"IP dynamique", C:"Virus", D:"Serveur web"}, answer: "A" },
-    { question: "95. Qu’est-ce que l’authentification à deux facteurs ?", options: {A:"Mot de passe et méthode supplémentaire pour sécurité", B:"Mot de passe simple", C:"Adresse IP", D:"Protocole réseau"}, answer: "A" },
-    { question: "96. Qu’est-ce que le hashing ?", options: {A:"Chiffrement irréversible pour stocker mots de passe", B:"Compression", C:"Antivirus", D:"IP"}, answer: "A" },
-    { question: "97. Différence entre chiffrement symétrique et asymétrique ?", options: {A:"Symétrique même clé, asymétrique clé publique/privée", B:"Aucune", C:"Asymétrique plus rapide", D:"Symétrique plus lent"}, answer: "A" },
-    { question: "98. Exemple d’algorithme symétrique ?", options: {A:"AES", B:"RSA", C:"SHA-256", D:"MD5"}, answer: "A" },
-    { question: "99. Exemple d’algorithme asymétrique ?", options: {A:"RSA", B:"AES", C:"MD5", D:"SHA-1"}, answer: "A" },
-    { question: "100. Qu’est-ce qu’une blockchain ?", options: {A:"Base de données décentralisée, immuable et sécurisée", B:"Virus", C:"Serveur web", D:"Protocole réseau"}, answer: "A" },
-    { question: "101. Qu’est-ce qu’un smart contract ?", options: {A:"Programme autonome sur blockchain qui exécute conditions automatiquement", B:"Serveur web", C:"Protocole", D:"Base de données"}, answer: "A" },
-    { question: "102. Rôle principal d’un routeur Wi-Fi ?", options: {A:"Transmettre signal internet aux appareils", B:"Stocker fichiers", C:"Compiler code", D:"Allouer mémoire"}, answer: "A" },
-    { question: "103. Différence entre IPv4 et IPv6 ?", options: {A:"IPv6 adresse 128 bits, IPv4 32 bits", B:"Aucune", C:"IPv4 plus sécurisé", D:"IPv6 plus lent"}, answer: "A" },
-    { question: "104. Qu’est-ce qu’un serveur FTP ?", options: {A:"Serveur pour transférer fichiers", B:"Serveur web", C:"Base de données", D:"Virus"}, answer: "A" },
-    { question: "105. Qu’est-ce que le Big Data ?", options: {A:"Traitement et analyse de grands volumes de données", B:"Petit fichier", C:"Serveur web", D:"Protocole réseau"}, answer: "A" },
-    { question: "106. Qu’est-ce que l’IoT (Internet des objets) ?", options: {A:"Objets connectés échangeant données via internet", B:"Serveur web", C:"Virus informatique", D:"Base de données"}, answer: "A" },
-    { question: "107. Qu’est-ce que l’apprentissage automatique (Machine Learning) ?", options: {A:"Algorithmes qui apprennent à partir de données", B:"Serveur web", C:"Virus", D:"Protocole"}, answer: "A" },
-    { question: "108. Exemple d’algorithme supervisé ?", options: {A:"Régression linéaire", B:"K-means", C:"PageRank", D:"AES"}, answer: "A" },
-    { question: "109. Exemple d’algorithme non supervisé ?", options: {A:"K-means", B:"Régression", C:"RSA", D:"AES"}, answer: "A" },
-    { question: "110. Qu’est-ce que l’IA générative ?", options: {A:"IA qui crée contenu texte/image/audio", B:"Virus", C:"Serveur web", D:"Base de données"}, answer: "A" },
-    { question: "111. Qu’est-ce que le versioning dans Git ?", options: {A:"Gestion de versions de code", B:"Serveur web", C:"Virus", D:"Protocole"}, answer: "A" },
-    { question: "112. Commande pour cloner un dépôt Git ?", options: {A:"git clone", B:"git init", C:"git push", D:"git commit"}, answer: "A" },
-    { question: "113. Commande pour envoyer modifications locales vers dépôt distant ?", options: {A:"git push", B:"git clone", C:"git pull", D:"git status"}, answer: "A" },
-    { question: "114. Commande pour vérifier état fichiers Git ?", options: {A:"git status", B:"git push", C:"git clone", D:"git init"}, answer: "A" },
-    { question: "115. Qu’est-ce qu’un merge dans Git ?", options: {A:"Fusionner branches dans une branche principale", B:"Supprimer fichiers", C:"Créer dépôt", D:"Aucune"}, answer: "A" },
-    { question: "116. Qu’est-ce qu’un pull request ?", options: {A:"Proposer modifications d’une branche vers principale", B:"Fusionner branches automatiquement", C:"Supprimer branche", D:"Créer branche"}, answer: "A" },
-    { question: "117. Qu’est-ce que Docker ?", options: {A:"Plateforme pour créer, déployer et exécuter applications dans conteneurs", B:"Serveur web", C:"Base de données", D:"Virus"}, answer: "A" },
-    { question: "118. Avantage principal des conteneurs Docker ?", options: {A:"Isolation, portabilité et rapidité", B:"Virus", C:"Serveur web", D:"Base de données"}, answer: "A" },
-    { question: "119. Qu’est-ce qu’une microservice architecture ?", options: {A:"Architecture divisant application en services indépendants", B:"Monolithique", C:"Serveur web", D:"Virus"}, answer: "A" },
-    { question: "120. Avantage principal des microservices ?", options: {A:"Scalabilité, maintenabilité et déploiement indépendant", B:"Aucune", C:"Plus lent", D:"Moins sécurisé"}, answer: "A" }
-);
+      const randomX = Math.random() * maxX;
+      const randomY = Math.random() * maxY;
 
+      noBtn.style.left = randomX + 'px';
+      noBtn.style.top = randomY + 'px';
+    });
 
-let currentQuestion = 0;
-let score = 0;
-
-const quizContainer = document.getElementById('quiz');
-const feedbackContainer = document.getElementById('feedback');
-const resultContainer = document.getElementById('result');
-const checkButton = document.getElementById('check');
-const nextButton = document.getElementById('next');
-
-function loadQuestion() {
-    const q = quizData[currentQuestion];
-    const optionsHTML = [];
-    for (let key in q.options) {
-        optionsHTML.push(`
-            <li>
-                <label>
-                    <input type="radio" name="answer" value="${key}"> ${key}: ${q.options[key]}
-                </label>
-            </li>
-        `);
-    }
-    quizContainer.innerHTML = `
-        <div class="question-num">Question ${currentQuestion + 1} / ${quizData.length}</div>
-        <div class="question">${q.question}</div>
-        <ul class="answers">${optionsHTML.join('')}</ul>
-    `;
-    feedbackContainer.innerHTML = '';
-    checkButton.style.display = 'inline';
-    nextButton.style.display = 'none';
-}
-
-checkButton.addEventListener('click', () => {
-    const selected = document.querySelector('input[name="answer"]:checked');
-    if (!selected) {
-        alert("Veuillez choisir une réponse !");
-        return;
-    }
-
-    const isCorrect = selected.value === quizData[currentQuestion].answer;
-    feedbackContainer.innerHTML = isCorrect ? "✅ Correct !" : `❌ Incorrect ! La bonne réponse est ${quizData[currentQuestion].answer}`;
-    
-    if (isCorrect) score++;
-    
-    checkButton.style.display = 'none';
-    nextButton.style.display = 'inline';
-});
-
-nextButton.addEventListener('click', () => {
-    currentQuestion++;
-    if (currentQuestion < quizData.length) {
-        loadQuestion();
-    } else {
-        quizContainer.innerHTML = '';
-        checkButton.style.display = 'none';
-        nextButton.style.display = 'none';
-        feedbackContainer.innerHTML = '';
-        resultContainer.innerHTML = `<h2>Votre score: ${score} / ${quizData.length}</h2>`;
-    }
-});
-
-loadQuestion();
-</script>
-
+    yesBtn.addEventListener('click', () => {
+      buttonsDiv.style.display = 'none';
+      msg.style.display = 'block';
+    });
+  </script>
 </body>
 </html>
